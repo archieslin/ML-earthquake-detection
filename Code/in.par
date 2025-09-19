@@ -1,0 +1,22 @@
+# Training & Validation 
+
+mseed = 0121Dapu.mseed 
+t = 2025-01-20T16:17:34.000Z
+dt = 5
+
+label_train = ["ALS", "CHN8", "CHY", "SCL", "ELD"]
+label_valid = ["SSD", "TAI", "TAI1", "WDL", "WGK", "WSF", "YUS"]
+
+# CNN
+sequence_length = 501 
+# RNN
+input_size = 501
+hidden_size = 128
+num_layers = 10
+num_classes = 2
+
+
+epochs = 200
+model_stats = 1Drnn.pth 
+
+

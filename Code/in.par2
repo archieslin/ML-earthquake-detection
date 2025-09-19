@@ -1,0 +1,31 @@
+# Test data
+
+mseed = 0611Hualien.mseed
+# mseed = 0827Yilan.mseed
+# mseed = 0130Dapu.mseed 
+
+t = 2025-06-11T11:0:34.000Z
+# t = 2025-8-27T13:11:16.000Z
+# t = 2025-01-30T2:12:4.000Z
+dt = 5
+
+label_train = 
+label_valid = 
+# label_test2 = []
+# label_test = ["CHK", "ECB", "EGC", "ESL", "YUS"] #0611 Hualien
+# label_test2 = ["HWA.HLE", "HWA.HLZ"]
+# label_test = ["ANP", "ENA", "EGS", "EHP", "ETM", "HSN", "HSN1", "ILA", "NHW", "NJD", "NNS", "NOU", "NSK", "NST", "PCY"] #0827 Yilan
+label_test2 = []
+label_test = ["ECS", "SCL", "SGL", "SPT", "SSD", "TAI", "TAI1", "WDL", "WGK", "WNT", "WSF", "WTC"] #0130 Dapu
+
+# CNN
+sequence_length = 501 
+# RNN
+input_size = 501
+hidden_size = 128
+num_layers = 10
+num_classes = 2
+
+epochs = 200
+model_stats = 1Drnn.pth 
+
