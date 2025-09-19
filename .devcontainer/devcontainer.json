@@ -9,5 +9,5 @@
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir numpy pandas obspy torch"
+  "postCreateCommand": "pip install --no-cache-dir numpy pandas obspy torch sklearn"
 }
