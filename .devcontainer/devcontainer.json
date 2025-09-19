@@ -9,5 +9,5 @@
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir numpy pandas obspy"
+  "postCreateCommand": "pip install --no-cache-dir numpy pandas obspy scikit-learn"
 }
