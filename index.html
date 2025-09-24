@@ -20,8 +20,11 @@
         footer { text-align: center; color: #888; margin: 2rem 0 1rem 0; }
         .qa { background: #f2f6fa; border-radius: 8px; padding: 1.5em; margin-top: 1.5em; }
         .qa h3 { margin-top: 0; }
-        .qa dt { font-weight: bold; margin-top: 1em; }
-        .qa dd { margin-left: 0; margin-bottom: 1em; }
+        .qa label { font-weight: bold; }
+        .qa input[type="text"] { padding: 0.5em; border-radius: 4px; border: 1px solid #ccc; margin-top: 0.5em; }
+        .qa button { padding: 0.5em 1.2em; border-radius: 4px; border: none; background: #2d3e50; color: #fff; margin-left: 0.5em; cursor: pointer; }
+        .qa button:hover { background: #34495e; }
+        #ai-answer { margin-top: 1em; background: #f2f6fa; padding: 1em; border-radius: 8px; min-height: 2em; }
     </style>
 </head>
 <body>
@@ -118,26 +121,46 @@
         </section>
         <section class="qa">
             <h2>AI專區：模型問答</h2>
-            <dl>
-                <dt>Q1：三種模型各有什麼優缺點？</dt>
-                <dd>
-                    <strong>CNN：</strong> 計算效率高，適合大量波形資料，特徵萃取能力強，但對時間序列長期依賴較弱。<br>
-                    <strong>RNN：</strong> 擅長處理時間序列資料，能捕捉長期依賴，但訓練速度較慢，容易梯度消失。<br>
-                    <strong>I_CNN：</strong> 改良型CNN，結合多層特徵與正則化，提升分類準確率與泛化能力，但模型較複雜，需較多計算資源。
-                </dd>
-                <dt>Q2：如何選擇適合的模型？</dt>
-                <dd>
-                    若資料量大且需快速分類，可選CNN；若重視時間序列特性，可選RNN；若追求最高準確率且資源充足，可選I_CNN。
-                </dd>
-                <dt>Q3：模型在地震偵測上的應用有何差異？</dt>
-                <dd>
-                    CNN適合初步自動分類，RNN適合事件序列分析，I_CNN則適合精細分類與異常偵測。
-                </dd>
-            </dl>
+            <form id="ai-form">
+                <label for="user-question">請輸入你的問題：</label><br>
+                <input type="text" id="user-question" style="width:70%;" required>
+                <button type="submit">送出</button>
+            </form>
+            <div id="ai-answer"></div>
         </section>
     </main>
     <footer>
         &copy; 2025 ML Earthquake Detection Project
     </footer>
+    <script>
+    async function askLLM(question) {
+        // 請將 APIKEY 與 YOUR_API_KEY 替換為你的 LLM API 端點與金鑰
+        const response = await fetch("APIKEY", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer YOUR_API_KEY"
+            },
+            body: JSON.stringify({
+                messages: [{role: "user", content: question}],
+                model: "gpt-3.5-turbo"
+            })
+        });
+        const data = await response.json();
+        return data.choices[0].message.content;
+    }
+    document.getElementById("ai-form").onsubmit = async function(e) {
+        e.preventDefault();
+        const question = document.getElementById("user-question").value;
+        const answerDiv = document.getElementById("ai-answer");
+        answerDiv.innerText = "AI 正在思考...";
+        try {
+            const answer = await askLLM(question);
+            answerDiv.innerText = answer;
+        } catch {
+            answerDiv.innerText = "AI 回答失敗，請稍後再試。";
+        }
+    };
+    </script>
 </body>
 </html>
