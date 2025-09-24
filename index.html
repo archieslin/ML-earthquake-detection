@@ -2,65 +2,138 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>ML Earthquake Detection - 模型正確率比較</title>
+    <title>ML Earthquake Detection - 模型成果比較</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body { font-family: "Segoe UI", Arial, sans-serif; background: #f7f7f7; margin: 0; }
         header { background: #2d3e50; color: #fff; padding: 2rem 1rem; text-align: center; }
-        main { max-width: 900px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);}
+        main { max-width: 1000px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);}
         h1, h2 { margin-top: 0; }
         section { margin-bottom: 2.5rem; }
-        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        th, td { border: 1px solid #bbb; padding: 0.7em 1em; text-align: center; }
-        th { background: #e3eaf2; }
-        tr:nth-child(even) { background: #f7f7f7; }
+        .img-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem; }
+        .img-col { flex: 1 1 220px; text-align: center; }
+        .img-col img { max-width: 100%; border-radius: 6px; box-shadow: 0 1px 6px rgba(0,0,0,0.08);}
         .caption { font-size: 0.95em; color: #555; margin-top: 0.5em; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1.5em; }
+        th, td { border: 1px solid #bbb; padding: 0.7em; text-align: center; }
+        th { background: #e8e8e8; }
         footer { text-align: center; color: #888; margin: 2rem 0 1rem 0; }
+        .qa { background: #f2f6fa; border-radius: 8px; padding: 1.5em; margin-top: 1.5em; }
+        .qa h3 { margin-top: 0; }
+        .qa dt { font-weight: bold; margin-top: 1em; }
+        .qa dd { margin-left: 0; margin-bottom: 1em; }
     </style>
 </head>
 <body>
     <header>
         <h1>ML Earthquake Detection</h1>
-        <p>三種模型正確率比較</p>
+        <p>三種模型成果比較與AI互動專區</p>
     </header>
     <main>
         <section>
-            <h2>模型正確率統計表</h2>
+            <h2>模型測試與驗證集成果展示</h2>
+            <h3>CNN 模型</h3>
+            <div class="img-row">
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/CNN_confusion_matrix.png" alt="CNN 驗證集混淆矩陣">
+                    <div class="caption">CNN 驗證集混淆矩陣</div>
+                </div>
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/CNN_confusion_matrix_TEST.png" alt="CNN 測試集混淆矩陣">
+                    <div class="caption">CNN 測試集混淆矩陣</div>
+                </div>
+            </div>
+            <div class="img-row">
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/CNN_valid_examples_overview.png" alt="CNN 驗證波形分類">
+                    <div class="caption">CNN 驗證集波形分類</div>
+                </div>
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/CNN_test_examples_overview_TEST.png" alt="CNN 測試波形分類">
+                    <div class="caption">CNN 測試集波形分類</div>
+                </div>
+            </div>
+            <h3>RNN 模型</h3>
+            <div class="img-row">
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/RNN_confusion_matrix.png" alt="RNN 驗證集混淆矩陣">
+                    <div class="caption">RNN 驗證集混淆矩陣</div>
+                </div>
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/RNN_confusion_matrix_TEST.png" alt="RNN 測試集混淆矩陣">
+                    <div class="caption">RNN 測試集混淆矩陣</div>
+                </div>
+            </div>
+            <div class="img-row">
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/RNN_valid_examples_overview.png" alt="RNN 驗證波形分類">
+                    <div class="caption">RNN 驗證集波形分類</div>
+                </div>
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/RNN_test_examples_overview_TEST.png" alt="RNN 測試波形分類">
+                    <div class="caption">RNN 測試集波形分類</div>
+                </div>
+            </div>
+            <h3>I_CNN 改良型CNN模型</h3>
+            <div class="img-row">
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/I_CNN_confusion_matrix_TEST.png" alt="I_CNN 測試集混淆矩陣">
+                    <div class="caption">I_CNN 測試集混淆矩陣</div>
+                </div>
+                <div class="img-col">
+                    <img src="https://archieslin.github.io/ML-earthquake-detection/Code/I_CNN_test_examples_overview_TEST.png" alt="I_CNN 測試波形分類">
+                    <div class="caption">I_CNN 測試集波形分類</div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>三種模型正確率統計</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>模型名稱</th>
+                        <th>模型</th>
                         <th>驗證集正確率</th>
                         <th>測試集正確率</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1D CNN</td>
-                        <td>92.3%</td>
-                        <td>91.8%</td>
+                        <td>CNN</td>
+                        <td>92.5%</td>
+                        <td>91.2%</td>
                     </tr>
                     <tr>
-                        <td>1D RNN</td>
-                        <td>90.7%</td>
-                        <td>90.2%</td>
+                        <td>RNN</td>
+                        <td>90.8%</td>
+                        <td>89.7%</td>
                     </tr>
                     <tr>
-                        <td>I_CNN (改良型CNN)</td>
-                        <td>93.5%</td>
-                        <td>93.0%</td>
+                        <td>I_CNN</td>
+                        <td>93.6%</td>
+                        <td>92.8%</td>
                     </tr>
                 </tbody>
             </table>
-            <div class="caption">
-                *以上數值僅為範例，請依實際訓練結果填寫。
-            </div>
+            <div class="caption" style="text-align:right;">*正確率為範例數值，請依實際成果更新</div>
         </section>
-        <section>
-            <h2>成果展示</h2>
-            <ul>
-                <li>各模型混淆矩陣與波形分類成果請參見下方圖示。</li>
-            </ul>
+        <section class="qa">
+            <h2>AI專區：模型問答</h2>
+            <dl>
+                <dt>Q1：三種模型各有什麼優缺點？</dt>
+                <dd>
+                    <strong>CNN：</strong> 計算效率高，適合大量波形資料，特徵萃取能力強，但對時間序列長期依賴較弱。<br>
+                    <strong>RNN：</strong> 擅長處理時間序列資料，能捕捉長期依賴，但訓練速度較慢，容易梯度消失。<br>
+                    <strong>I_CNN：</strong> 改良型CNN，結合多層特徵與正則化，提升分類準確率與泛化能力，但模型較複雜，需較多計算資源。
+                </dd>
+                <dt>Q2：如何選擇適合的模型？</dt>
+                <dd>
+                    若資料量大且需快速分類，可選CNN；若重視時間序列特性，可選RNN；若追求最高準確率且資源充足，可選I_CNN。
+                </dd>
+                <dt>Q3：模型在地震偵測上的應用有何差異？</dt>
+                <dd>
+                    CNN適合初步自動分類，RNN適合事件序列分析，I_CNN則適合精細分類與異常偵測。
+                </dd>
+            </dl>
         </section>
     </main>
     <footer>
