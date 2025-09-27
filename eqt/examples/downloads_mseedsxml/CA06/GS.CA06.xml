@@ -3,10 +3,10 @@
  <Sender>SCEDC</Sender>
  <Module>SCEDC WEB SERVICE: fdsnws-station | version: 1.1</Module>
  <ModuleURI>http://service.scedc.caltech.edu/fdsnws/station/1/query?net=GS&amp;sta=CA06&amp;cha=HHZ&amp;loc=00&amp;start=2019-09-01T00:00:00.000-07:00&amp;end=2019-09-02T00:00:00.000-07:00&amp;level=resp</ModuleURI>
- <Created>2025-09-17T02:31:00</Created>
- <Network code="GS" startDate="2019-07-07T00:00:00" endDate="2024-12-17T20:00:00">
+ <Created>2025-09-27T08:33:44</Created>
+ <Network code="GS" startDate="2019-07-07T00:00:00" endDate="3000-01-01T00:00:00">
   <Description>US Geological Survey Networks</Description>
-  <TotalNumberStations>10</TotalNumberStations>
+  <TotalNumberStations>11</TotalNumberStations>
   <SelectedNumberStations>1</SelectedNumberStations>
   <Station code="CA06" endDate="2020-01-22T18:30:00" startDate="2019-07-10T00:00:00">
    <Latitude>35.59962</Latitude>

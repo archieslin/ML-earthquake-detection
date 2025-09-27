@@ -3,7 +3,7 @@
  <Sender>SCEDC</Sender>
  <Module>SCEDC WEB SERVICE: fdsnws-station | version: 1.1</Module>
  <ModuleURI>http://service.scedc.caltech.edu/fdsnws/station/1/query?net=PB&amp;sta=B921&amp;cha=EHZ&amp;loc=--&amp;start=2019-09-01T00:00:00.000-07:00&amp;end=2019-09-02T00:00:00.000-07:00&amp;level=resp</ModuleURI>
- <Created>2025-09-17T02:32:00</Created>
+ <Created>2025-09-27T08:34:41</Created>
  <Network code="PB" startDate="2005-06-01T00:00:00" endDate="3000-01-01T00:00:00">
   <Description>Plate Boundary Observatory Borehole Network</Description>
   <TotalNumberStations>91</TotalNumberStations>
