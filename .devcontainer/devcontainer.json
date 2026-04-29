@@ -1,13 +1,19 @@
 {
-  "name": "Python 3",
+  "name": "SeisBench & Seismology Env",
   "image": "mcr.microsoft.com/devcontainers/python:3.10",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "ms-python.vscode-pylance"
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir numpy pandas obspy scikit-learn eqtransformer"
+  // 使用 features 安裝必要的系統工具
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:1": {}
+  },
+  // 在容器啟動後執行的指令
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libsndfile1 && pip install --upgrade pip && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && pip install obspy seisbench pandas scikit-learn"
 }
