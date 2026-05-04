@@ -10,10 +10,8 @@
       ]
     }
   },
-  // 使用 features 安裝必要的系統工具
   "features": {
     "ghcr.io/devcontainers/features/common-utils:1": {}
   },
-  // 在容器啟動後執行的指令
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libsndfile1 && pip install --upgrade pip && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && pip install obspy seisbench pandas scikit-learn"
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libsndfile1 && pip install --upgrade pip && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && pip install obspy seisbench pandas scikit-learn huggingface_hub"
 }
