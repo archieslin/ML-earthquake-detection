@@ -24,3 +24,12 @@ generator.augmentation(sbg.RandomWindow(windowlen=3000))
 generator.augmentation(sbg.Normalize(detrend_axis=-1, amp_norm_axis=-1))
 
 print(generator)
+
+# 假設我們要標註 P 波與 S 波的位置
+generator.label_generator = sbg.ProbabilisticLabeller(
+    label_columns=["trace_p_arrival_sample", "trace_s_arrival_sample"],
+    sigma=20  # 高斯標準差
+)
+
+sample = generator[200]
+print("Labels shape:", sample["Y"].shape)
