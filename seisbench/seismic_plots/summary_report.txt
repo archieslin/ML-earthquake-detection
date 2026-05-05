@@ -1,0 +1,40 @@
+=== 地震自動辨識統計報告 ===
+處理時間: 2026-05-05T06:49:07.944209Z
+資料來源: ../Data/0502_14_15_HL.mseed
+時間範圍: 2026-05-02T14:00:00.000000Z ~ 2026-05-02T14:59:59.990000Z
+------------------------------
+
+總計 Picks (P/S 波拾取): 48 筆
+總計 Detections (事件偵測): 48 筆
+
+各測站統計 (Station Statistics):
+phase      P  S
+station        
+TW.ALS.10  1  1
+TW.CHK.10  0  1
+TW.CHY.10  1  1
+TW.ECB.10  1  1
+TW.ECS.10  2  1
+TW.ELD.10  1  0
+TW.ENA.10  2  2
+TW.ESL.10  1  1
+TW.ETM.10  2  1
+TW.HWA.10  1  0
+TW.NNS.10  1  1
+TW.NSK.10  1  1
+TW.PNG.10  1  0
+TW.SEB.10  1  0
+TW.SGS.10  2  2
+TW.SML.10  2  1
+TW.SSD.10  2  1
+TW.STY.10  1  1
+TW.WDG.10  1  0
+TW.WNT.10  1  1
+TW.WSF.10  1  1
+TW.WTP.10  2  2
+
+平均辨識信心度 (Average Confidence):
+  P phase: 0.9030
+  S phase: 0.8669
+
+=== 報告結束 ===

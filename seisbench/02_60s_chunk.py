@@ -6,10 +6,10 @@ import seisbench.models as sbm
 from obspy import read, UTCDateTime
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0827Yilan.mseed"
+MSEED_PATH = "../Data/0502_14_15_HL.mseed"
 OUTPUT_DIR = "seismic_plots"
-#CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
-CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
+CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
+# CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
 OVERLAP = 60         # 時段間重疊 1 分鐘 (確保地震不被切斷)
 STRIDE = 500         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
 MODEL_TYPE = "stead" # 使用 EQTransformer
@@ -77,8 +77,13 @@ while current_start < global_end:
                 if sta_ann[j].stats.channel[-1] != "N":
                     axs[1].plot(sta_ann[j].times() + offset, sta_ann[j].data, label=sta_ann[j].stats.channel)
             
+            # --- 設定 Y 軸限制與標籤 ---
             axs[0].set_title(f"Station: {sta} | Start: {current_start}")
+            axs[0].set_ylabel("Amplitude")
             axs[0].legend(loc="upper right")
+            
+            axs[1].set_ylabel("Probability")
+            axs[1].set_ylim(0, 1.0)  # 【關鍵修改】將機率軸上限固定在 1.0
             axs[1].legend(loc="upper right")
             
             timestamp = current_start.strftime("%Y%m%d_%H%M%S")

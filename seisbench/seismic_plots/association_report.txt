@@ -1,0 +1,24 @@
+分析完成！
+------------------------------------
+原始觸發總數：48 筆
+【確定】地震事件數 (>=5 站)：3 個
+【疑似】地震事件數 (3-4 站)：1 個
+【判定】孤立訊號群數 (<3 站)：4 個
+完整原始編目儲存至：seismic_plots/associated_catalog_with_notes.csv
+
+--- 地震事件列表 (>=5 站) ---
+  station         start_time_str                    end_time  peak_value  event_id                      note
+TW.SGS.10 2026-05-02 14:22:36.15 2026-05-02T14:22:41.210000Z    0.999969         2  Earthquake (Total 9 sta)
+TW.CHK.10 2026-05-02 14:26:22.38 2026-05-02T14:26:24.990000Z    0.852402         4 Earthquake (Total 21 sta)
+TW.HWA.10 2026-05-02 14:48:28.77 2026-05-02T14:48:37.700000Z    0.999836         6  Earthquake (Total 6 sta)
+
+--- 疑似地震列表 (3-4 站) ---
+  station        start_time_str                    end_time  peak_value  event_id                    note
+TW.CHK.10 2026-05-02 14:29:54.4 2026-05-02T14:30:06.050000Z    0.957087         5 Suspected (Total 3 sta)
+
+--- 孤立訊號列表 (<3 站) ---
+  station         start_time_str                    end_time  peak_value  event_id                   note
+TW.EAS.10 2026-05-02 14:15:35.00 2026-05-02T14:15:39.630000Z    0.981073         0 Isolated (Total 1 sta)
+TW.WSF.10 2026-05-02 14:22:05.00 2026-05-02T14:22:06.910000Z    0.901274         1 Isolated (Total 1 sta)
+TW.SGS.10 2026-05-02 14:23:39.12 2026-05-02T14:23:44.080000Z    0.999976         3 Isolated (Total 2 sta)
+TW.WYL.10 2026-05-02 14:59:35.00 2026-05-02T14:59:39.130000Z    0.917809         7 Isolated (Total 1 sta)
