@@ -1,0 +1,57 @@
+=== 地震自動辨識統計報告 ===
+處理時間: 2026-05-05T05:46:53.522204Z
+資料來源: ../Data/0827Yilan.mseed
+時間範圍: 2025-08-27T13:11:00.000000Z ~ 2025-08-27T13:11:59.990000Z
+------------------------------
+
+總計 Picks (P/S 波拾取): 51 筆
+總計 Detections (事件偵測): 64 筆
+
+各測站統計 (Station Statistics):
+phase       P  S
+station         
+TW.ANP.10   1  0
+TW.CHK.10   1  0
+TW.CHY.10   1  1
+TW.ECB.10   1  0
+TW.EGS.10   1  1
+TW.ENA.10   1  1
+TW.ESL.10   1  0
+TW.ETM.10   1  0
+TW.HSN.10   1  1
+TW.HSN1.10  1  0
+TW.HWA.10   1  0
+TW.ILA.10   1  1
+TW.NHW.10   1  0
+TW.NJD.10   1  1
+TW.NJN.10   1  0
+TW.NML.10   1  1
+TW.NNS.10   1  0
+TW.NOU.10   1  1
+TW.NSK.10   1  0
+TW.NST.10   1  0
+TW.PCY.10   1  0
+TW.PCY.11   1  0
+TW.PNG.10   1  0
+TW.SCL.10   1  0
+TW.SCZ.10   1  0
+TW.SML.10   1  0
+TW.SSH.10   1  0
+TW.STY.10   1  0
+TW.TCU.10   1  0
+TW.TIPB.10  1  1
+TW.TIPB.11  1  1
+TW.WCH1.10  1  0
+TW.WDG.10   1  0
+TW.WGK.10   1  0
+TW.WNT.10   1  0
+TW.WPL.10   1  0
+TW.WTC.10   1  1
+TW.WWC.10   1  1
+TW.WYL.10   1  0
+
+平均辨識信心度 (Average Confidence):
+  P phase: 0.8372
+  S phase: 0.7594
+
+=== 報告結束 ===
