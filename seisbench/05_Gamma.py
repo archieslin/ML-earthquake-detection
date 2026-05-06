@@ -310,8 +310,9 @@ for _, event in catalog.iterrows():
     
     # 繪製各站波形
     for trace in sub:
-        # 取得測站座標與計算震源距
         current_sta_id = f"{trace.stats.network}.{trace.stats.station}.10"
+        sta_label = trace.stats.station # 取得站名，如 "ALS"
+        
         coords = station_dict.get(current_sta_id)
         if not coords: continue
         
@@ -320,16 +321,20 @@ for _, event in catalog.iterrows():
                        event["z(km)"]**2)
         all_distances.append(dist)
 
-        # --- 核心修正點 1：使用相對發震時間的時間軸 ---
-        # reftime=origin_time 會讓 times 陣列以發震時間為 0
-        # 發震前 10 秒會是 -10
         times = trace.times(reftime=origin_time)
-        
         peak = np.max(np.abs(trace.data))
         if peak == 0: continue
         normed = (trace.data / peak) * 5  
         
+        # 畫波形
         ax.plot(times, normed + dist, lw=0.8, color="gray", alpha=0.7)
+
+        # --- 新增：標記測站名稱 ---
+        # 標註在圖表左側邊界 (x_limit_min) 稍微往左一點點的位置
+        ax.text(ax.get_xlim()[0] - 0.5, dist, sta_label, 
+                fontsize=9, color="blue", weight="bold",
+                ha="right", va="center") 
+        # -----------------------
         
         # --- 核心修正點 2：標註 Picks 的時間計算 ---
         for p in event_picks:
