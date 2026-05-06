@@ -14,12 +14,4 @@
     "ghcr.io/devcontainers/features/common-utils:1": {}
   },
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libsndfile1 && pip install --upgrade pip && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && pip install obspy seisbench pandas scikit-learn huggingface_hub"
-<<<<<<< HEAD
 }
-=======
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 1a3435f (fix: save devcontainer changes from root)
->>>>>>> temp-fix
