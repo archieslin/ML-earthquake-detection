@@ -175,4 +175,184 @@ ax.set_ylim(2300, 3000)
 plt.savefig("Gamma_Association_Result.png", bbox_inches="tight")
 plt.close(fig)
 
+# --- 5. 輸出分析報告與詳細編目 ---
 
+# A. 座標回推 (公里 -> 經緯度)
+# Transformer 預期 (x, y) 單位通常是公尺，故需 * 1e3
+if not catalog.empty:
+    catalog["latitude"], catalog["longitude"] = transformer.transform(
+        catalog["x(km)"] * 1e3, catalog["y(km)"] * 1e3, direction="INVERSE"
+    )
+
+# B. 整合資訊與判定類別
+# 我們利用 assignments 來計算每個 event_idx 實際關聯到的站數
+event_station_counts = assignments.groupby("event_idx")["pick_idx"].count()
+catalog["total_picks"] = catalog["event_index"].map(event_station_counts)
+
+def get_note(n):
+    if n >= 5: return f"Earthquake (Total {n} picks)"
+    elif 3 <= n < 5: return f"Suspected (Total {n} picks)"
+    else: return f"Noise/Isolated (Total {n} picks)"
+
+catalog["note"] = catalog["total_picks"].apply(get_note)
+
+# C. 篩選與格式化輸出
+# 為了符合你的格式，我們從 pick_df 中找回每個事件「第一個觸發的站點」作為代表
+event_details = []
+for _, row in catalog.iterrows():
+    # 找到屬於該事件的所有 picks
+    event_picks_indices = assignments[assignments["event_idx"] == row["event_index"]]["pick_idx"]
+    event_picks = pick_df.iloc[event_picks_indices]
+    first_pick = event_picks.sort_values("timestamp").iloc[0] # 取最早觸發的站
+
+    event_details.append({
+        "station": first_pick["id"],
+        "start_time_str": row["time"],
+        "lat": round(row["latitude"], 4),
+        "lon": round(row["longitude"], 4),
+        "depth_km": round(row["z(km)"], 2),
+        "gamma_score": round(row["gamma_score"], 2),
+        "sigma_time": round(row["sigma_time"], 3),
+        "event_id": int(row["event_index"]),
+        "total_picks": int(row["total_picks"]),
+        "note": row["note"]
+    })
+
+detail_df = pd.DataFrame(event_details)
+
+# D. 儲存檔案
+OUTPUT_REPORT = os.path.join(OUTPUT_DIR, "association_report_G.txt")
+
+# 1. 篩選資料
+confirmed = detail_df[detail_df["total_picks"] >= 5]
+suspected = detail_df[(detail_df["total_picks"] >= 3) & (detail_df["total_picks"] < 5)]
+
+# 2. 定義要顯示的欄位
+cols = ["station", "start_time_str", "lat", "lon", "depth_km", "gamma_score", "event_id", "note"]
+
+# 3. 組合報告內容
+report_lines = [
+    "\n分析完成！",
+    "-" * 40,
+    f"原始觸發總數：{len(pick_df)} 筆",
+    f"【確定】地震事件數 (>=5 站)：{len(confirmed)} 個",
+    f"【疑似】地震事件數 (3-4 站)：{len(suspected)} 個",
+    
+    "\n--- 地震事件列表 (>=5 站) ---",
+    confirmed[cols].to_string(index=False) if not confirmed.empty else "（無符合事件）",
+    
+    "\n--- 疑似地震列表 (3-4 站) ---",
+    suspected[cols].to_string(index=False) if not suspected.empty else "（無符合事件）"
+]
+
+# 4. 合併並一次性輸出
+full_report_text = "\n".join(report_lines)
+print(full_report_text)
+
+# (選配) 如果想把這份純文字報告也存檔：
+with open(os.path.join(OUTPUT_DIR, "summary_report.txt"), "w", encoding="utf-8") as f:
+    f.write(full_report_text)
+
+with open(OUTPUT_REPORT, "w", encoding="utf-8") as f:
+    f.write(full_report_text)
+
+print(f"\n[系統通知] 統計報告已同步儲存至：{OUTPUT_REPORT}")
+
+
+### --- 6. 繪製每個事件的波形圖 (選配) ---
+# 1. 確保輸出目錄存在
+stream = obspy.read("../Data/0502_14_15_HL.mseed")
+EVENT_PLOT_DIR = os.path.join(OUTPUT_DIR, "event_plots")
+os.makedirs(EVENT_PLOT_DIR, exist_ok=True)
+
+print(f"開始繪製所有地震事件圖，總計：{len(catalog)} 個事件")
+
+for _, event in catalog.iterrows():
+    event_idx = int(event["event_index"])
+    
+    # 獲取該事件對應的 picks
+    event_indices = assignments[assignments["event_idx"] == event_idx]["pick_idx"]
+    # 假設你的原始 pick DataFrame 叫 pick_df (對應你之前的變數名)
+    event_picks = pick_df.iloc[event_indices].to_dict(orient="records")
+    
+    if not event_picks:
+        continue
+
+    # 計算繪圖時間範圍
+    pick_times = [UTCDateTime(p["timestamp"]) for p in event_picks]
+    first = min(pick_times)
+    last = max(pick_times)
+    
+    # 事件發震時間 (Origin Time)
+    origin_time = UTCDateTime(event["time"])
+
+    # 挑選並切割波形資料
+    sub = obspy.Stream()
+    unique_stations = np.unique([p["id"] for p in event_picks])
+    
+    for sta_full_id in unique_stations:
+        # sta_full_id 格式如 "TW.ALS.10"
+        sta_code = sta_full_id.split(".")[1]
+        st_select = stream.select(station=sta_code, channel="??Z")
+        if st_select:
+            # 切割範圍：發震前 5 秒到最後一個 Pick 後 15 秒
+            sub += st_select.slice(origin_time - 5, last + 15)
+
+    if not sub:
+        print(f"跳過事件 {event_idx}：無有效波形範圍")
+        continue
+
+    sub.detrend("demean")
+    sub.filter("highpass", freq=2.0)
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    all_distances = []
+    
+    # 繪製各站波形
+    for trace in sub:
+        # 正規化
+        peak = np.max(np.abs(trace.data))
+        if peak == 0: continue
+        normed = (trace.data / peak) * 5  # 放大 5 倍以便觀察
+        
+        # 取得測站座標與計算震源距
+        current_sta_id = f"{trace.stats.network}.{trace.stats.station}.10"
+        coords = station_dict.get(current_sta_id)
+        if not coords: continue
+        
+        # 計算 3D 震源距離
+        dist = np.sqrt((coords[0] - event["x(km)"])**2 + 
+                       (coords[1] - event["y(km)"])**2 + 
+                       event["z(km)"]**2)
+        all_distances.append(dist)
+        
+        # 時間軸對齊：以 Trace 的開始時間為 0
+        times = trace.times()
+        ax.plot(times, normed + dist, lw=0.8, color="gray", alpha=0.7)
+        
+        # 標註這一個 Trace 裡的 Picks
+        for p in event_picks:
+            if p["id"] == current_sta_id:
+                x_pick = UTCDateTime(p["timestamp"]) - trace.stats.starttime
+                color = "blue" if p["type"].upper() == "P" else "red"
+                ls = "-" if p["type"].upper() == "P" else "--"
+                ax.vlines(x_pick, dist - 4, dist + 4, color=color, linestyle=ls, lw=2, zorder=5)
+
+    # 繪製發震時間 (Origin Time) - 畫一次即可
+    # 假設所有 trace 的 starttime 差不多，我們取第一個 trace 作為基準
+    rel_origin = origin_time - sub[0].stats.starttime
+    ax.axvline(rel_origin, color="green", lw=2, ls=":", label="Origin Time", alpha=0.8)
+        
+    # 圖表美化
+    if all_distances:
+        ax.set_ylim(min(all_distances) - 10, max(all_distances) + 15)
+    
+    ax.set_ylabel("Hypocentral distance [km]")
+    ax.set_xlabel(f"Time [s] since {sub[0].stats.starttime.strftime('%H:%M:%S')}")
+    ax.set_title(f"Event {event_idx} | Depth: {event['z(km)']:.2f}km | Time: {event['time']}")
+    ax.grid(True, linestyle='--', alpha=0.5)
+    
+    plt.savefig(os.path.join(EVENT_PLOT_DIR, f"event_{event_idx:03d}.png"), bbox_inches="tight", dpi=150)
+    plt.close(fig)
+
+print("\n所有事件繪製完成！")

@@ -6,7 +6,7 @@ import seisbench.models as sbm
 from obspy import read, UTCDateTime
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0502_14_15_HL.mseed"
+MSEED_PATH = "../Data/0504_09_10.mseed"
 OUTPUT_DIR = "seismic_plots"
 CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
 # CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
@@ -60,35 +60,35 @@ while current_start < global_end:
         output = model.classify(stream, batch_size=24, stride=STRIDE)
 
         # --- A. 繪製測站波形圖 ---
-        stations = list(set([tr.stats.station for tr in stream]))
-        for sta in stations:
-            print(f"正在繪製測站 {sta} 的波形圖...")
-            sta_st = stream.select(station=sta)
-            sta_ann = annotations.select(station=sta)
+        # stations = list(set([tr.stats.station for tr in stream]))
+        # for sta in stations:
+        #     print(f"正在繪製測站 {sta} 的波形圖...")
+        #     sta_st = stream.select(station=sta)
+        #     sta_ann = annotations.select(station=sta)
             
-            if len(sta_st) < 3 or len(sta_ann) < 3:
-                continue
+        #     if len(sta_st) < 3 or len(sta_ann) < 3:
+        #        continue
 
-            fig, axs = plt.subplots(2, 1, figsize=(15, 10), sharex=True, gridspec_kw={"hspace": 0})
-            offset = sta_ann[0].stats.starttime - sta_st[0].stats.starttime
+        #     fig, axs = plt.subplots(2, 1, figsize=(15, 10), sharex=True, gridspec_kw={"hspace": 0})
+        #     offset = sta_ann[0].stats.starttime - sta_st[0].stats.starttime
             
-            for j in range(len(sta_st)):
-                axs[0].plot(sta_st[j].times(), sta_st[j].data, label=sta_st[j].stats.channel)
-                if sta_ann[j].stats.channel[-1] != "N":
-                    axs[1].plot(sta_ann[j].times() + offset, sta_ann[j].data, label=sta_ann[j].stats.channel)
+        #     for j in range(len(sta_st)):
+        #         axs[0].plot(sta_st[j].times(), sta_st[j].data, label=sta_st[j].stats.channel)
+        #         if sta_ann[j].stats.channel[-1] != "N":
+        #             axs[1].plot(sta_ann[j].times() + offset, sta_ann[j].data, label=sta_ann[j].stats.channel)
             
             # --- 設定 Y 軸限制與標籤 ---
-            axs[0].set_title(f"Station: {sta} | Start: {current_start}")
-            axs[0].set_ylabel("Amplitude")
-            axs[0].legend(loc="upper right")
+        #     axs[0].set_title(f"Station: {sta} | Start: {current_start}")
+        #     axs[0].set_ylabel("Amplitude")
+        #     axs[0].legend(loc="upper right")
             
-            axs[1].set_ylabel("Probability")
-            axs[1].set_ylim(0, 1.0)  # 【關鍵修改】將機率軸上限固定在 1.0
-            axs[1].legend(loc="upper right")
+        #     axs[1].set_ylabel("Probability")
+        #     axs[1].set_ylim(0, 1.0)  # 【關鍵修改】將機率軸上限固定在 1.0
+        #     axs[1].legend(loc="upper right")
             
-            timestamp = current_start.strftime("%Y%m%d_%H%M%S")
-            plt.savefig(os.path.join(OUTPUT_DIR, f"{sta}_{timestamp}.png"), bbox_inches='tight')
-            plt.close(fig)
+        #     timestamp = current_start.strftime("%Y%m%d_%H%M%S")
+        #     plt.savefig(os.path.join(OUTPUT_DIR, f"{sta}_{timestamp}.png"), bbox_inches='tight')
+        #     plt.close(fig)
 
         # --- B. 收集 Picks ---
         for p in output.picks:
