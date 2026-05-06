@@ -17,7 +17,7 @@ sns.set(font_scale=1.2)
 sns.set_style("ticks")
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0502_14_15_HL.mseed"
+MSEED_PATH = "../Data/0504_09_10.mseed"
 OUTPUT_DIR = "seismic_plots"
 CHUNK_LENGTH = 900  # 每次讀取 30 分鐘 (避免記憶體溢位)
 # CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
@@ -261,7 +261,7 @@ print(f"\n[系統通知] 統計報告已同步儲存至：{OUTPUT_REPORT}")
 
 ### --- 6. 繪製每個事件的波形圖 (選配) ---
 # 1. 確保輸出目錄存在
-stream = obspy.read("../Data/0502_14_15_HL.mseed")
+stream = obspy.read(MSEED_PATH)
 EVENT_PLOT_DIR = os.path.join(OUTPUT_DIR, "event_plots")
 os.makedirs(EVENT_PLOT_DIR, exist_ok=True)
 
@@ -296,7 +296,7 @@ for _, event in catalog.iterrows():
         st_select = stream.select(station=sta_code, channel="??Z")
         if st_select:
             # 切割範圍：發震前 5 秒到最後一個 Pick 後 15 秒
-            sub += st_select.slice(origin_time - 5, last + 15)
+            sub += st_select.slice(origin_time - 10, last + 15)
 
     if not sub:
         print(f"跳過事件 {event_idx}：無有效波形範圍")
@@ -310,45 +310,50 @@ for _, event in catalog.iterrows():
     
     # 繪製各站波形
     for trace in sub:
-        # 正規化
-        peak = np.max(np.abs(trace.data))
-        if peak == 0: continue
-        normed = (trace.data / peak) * 5  # 放大 5 倍以便觀察
-        
         # 取得測站座標與計算震源距
         current_sta_id = f"{trace.stats.network}.{trace.stats.station}.10"
         coords = station_dict.get(current_sta_id)
         if not coords: continue
         
-        # 計算 3D 震源距離
         dist = np.sqrt((coords[0] - event["x(km)"])**2 + 
                        (coords[1] - event["y(km)"])**2 + 
                        event["z(km)"]**2)
         all_distances.append(dist)
+
+        # --- 核心修正點 1：使用相對發震時間的時間軸 ---
+        # reftime=origin_time 會讓 times 陣列以發震時間為 0
+        # 發震前 10 秒會是 -10
+        times = trace.times(reftime=origin_time)
         
-        # 時間軸對齊：以 Trace 的開始時間為 0
-        times = trace.times()
+        peak = np.max(np.abs(trace.data))
+        if peak == 0: continue
+        normed = (trace.data / peak) * 5  
+        
         ax.plot(times, normed + dist, lw=0.8, color="gray", alpha=0.7)
         
-        # 標註這一個 Trace 裡的 Picks
+        # --- 核心修正點 2：標註 Picks 的時間計算 ---
         for p in event_picks:
             if p["id"] == current_sta_id:
-                x_pick = UTCDateTime(p["timestamp"]) - trace.stats.starttime
+                # 同樣以 origin_time 為基準計算偏移秒數
+                x_pick = UTCDateTime(p["timestamp"]) - origin_time
+                
                 color = "blue" if p["type"].upper() == "P" else "red"
                 ls = "-" if p["type"].upper() == "P" else "--"
                 ax.vlines(x_pick, dist - 4, dist + 4, color=color, linestyle=ls, lw=2, zorder=5)
 
-    # 繪製發震時間 (Origin Time) - 畫一次即可
-    # 假設所有 trace 的 starttime 差不多，我們取第一個 trace 作為基準
-    rel_origin = origin_time - sub[0].stats.starttime
-    ax.axvline(rel_origin, color="green", lw=2, ls=":", label="Origin Time", alpha=0.8)
+    # 繪製發震時間 (Origin Time) 
+    # 因為現在 x 軸 0 就是 Origin Time，直接畫在 0 即可
+    ax.axvline(0, color="green", lw=2, ls=":", label="Origin Time", alpha=0.8)
         
     # 圖表美化
     if all_distances:
         ax.set_ylim(min(all_distances) - 10, max(all_distances) + 15)
+        # 固定顯示範圍，例如：發震前 5 秒到最後一個 Pick 後 10 秒
+        ax.set_xlim(-5, (last - origin_time) + 10)
     
     ax.set_ylabel("Hypocentral distance [km]")
-    ax.set_xlabel(f"Time [s] since {sub[0].stats.starttime.strftime('%H:%M:%S')}")
+    ax.set_xlabel("Time [s] relative to Origin Time") # 這裡標題也改一下
+
     ax.set_title(f"Event {event_idx} | Depth: {event['z(km)']:.2f}km | Time: {event['time']}")
     ax.grid(True, linestyle='--', alpha=0.5)
     
