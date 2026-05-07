@@ -6,12 +6,12 @@ import seisbench.models as sbm
 from obspy import read, UTCDateTime
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0504_09_10.mseed"
+MSEED_PATH = "../Data/0504.mseed"
 OUTPUT_DIR = "seismic_plots"
 CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
 # CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
 OVERLAP = 60         # 時段間重疊 1 分鐘 (確保地震不被切斷)
-STRIDE = 500         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
+STRIDE = 3000         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
 MODEL_TYPE = "stead" # 使用 EQTransformer
 
 if not os.path.exists(OUTPUT_DIR):
@@ -133,35 +133,3 @@ if all_detections_data:
     df_detections = df_detections.sort_values(by='start_time').reset_index(drop=True)
     
     df_detections.to_csv(os.path.join(OUTPUT_DIR, "detections_results.csv"), index=False, encoding='utf-8-sig')
-
-# --- 6. 產生偵測統計報告 (summary_report.txt) ---
-report_path = os.path.join(OUTPUT_DIR, "summary_report.txt")
-
-with open(report_path, "w", encoding="utf-8") as f:
-    f.write("=== 地震自動辨識統計報告 ===\n")
-    f.write(f"處理時間: {UTCDateTime.now()}\n")
-    f.write(f"資料來源: {MSEED_PATH}\n")
-    f.write(f"時間範圍: {global_start} ~ {global_end}\n")
-    f.write("-" * 30 + "\n\n")
-
-    if not df_picks.empty:
-        f.write(f"總計 Picks (P/S 波拾取): {len(df_picks)} 筆\n")
-        f.write(f"總計 Detections (事件偵測): {len(df_detections)} 筆\n\n")
-
-        # 統計各測站的數量
-        f.write("各測站統計 (Station Statistics):\n")
-        station_stats = df_picks.groupby(['station', 'phase']).size().unstack(fill_value=0)
-        f.write(station_stats.to_string())
-        f.write("\n\n")
-
-        # 統計信心值分佈 (平均值)
-        avg_conf = df_picks.groupby('phase')['peak_value'].mean()
-        f.write("平均辨識信心度 (Average Confidence):\n")
-        for phase, val in avg_conf.items():
-            f.write(f"  {phase} phase: {val:.4f}\n")
-    else:
-        f.write("本次處理未偵測到任何地震事件。\n")
-
-    f.write("\n=== 報告結束 ===")
-
-print(f"偵測統計報告已列出於: {report_path}")

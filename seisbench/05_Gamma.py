@@ -17,13 +17,8 @@ sns.set(font_scale=1.2)
 sns.set_style("ticks")
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0504_09_10.mseed"
+MSEED_PATH = "../Data/0504.mseed"
 OUTPUT_DIR = "seismic_plots"
-CHUNK_LENGTH = 900  # 每次讀取 30 分鐘 (避免記憶體溢位)
-# CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
-OVERLAP = 60         # 時段間重疊 1 分鐘 (確保地震不被切斷)
-STRIDE = 500         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
-MODEL_TYPE = "stead" # 使用 EQTransformer
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -102,7 +97,6 @@ else:
 
 # 迴圈結束後再轉為pandas DataFrame，避免每次迴圈都轉換造成效能問題
 pick_df = pd.DataFrame(pick_df)
-print(pick_df)
 
 with open('stations.json', 'r', encoding='utf-8') as f:
     stations_data = json.load(f)
@@ -247,7 +241,6 @@ report_lines = [
 
 # 4. 合併並一次性輸出
 full_report_text = "\n".join(report_lines)
-print(full_report_text)
 
 # (選配) 如果想把這份純文字報告也存檔：
 with open(os.path.join(OUTPUT_DIR, "summary_report.txt"), "w", encoding="utf-8") as f:
@@ -285,6 +278,7 @@ for _, event in catalog.iterrows():
     
     # 事件發震時間 (Origin Time)
     origin_time = UTCDateTime(event["time"])
+    print(f"正在繪製事件 {event_idx}：發震時間 {origin_time}, 觸發站數 {len(event_picks)}")
 
     # 挑選並切割波形資料
     sub = obspy.Stream()
@@ -330,10 +324,16 @@ for _, event in catalog.iterrows():
         ax.plot(times, normed + dist, lw=0.8, color="gray", alpha=0.7)
 
         # --- 新增：標記測站名稱 ---
-        # 標註在圖表左側邊界 (x_limit_min) 稍微往左一點點的位置
-        ax.text(ax.get_xlim()[0] - 0.5, dist, sta_label, 
-                fontsize=9, color="blue", weight="bold",
-                ha="right", va="center") 
+        x_text = -4.8  # 稍微往右偏一點點，不要貼死邊界
+        ax.text(x_text, dist + 0.5, sta_label, 
+                fontsize=8, 
+                color="blue", 
+                weight="bold",
+                ha="left",      # 靠左對齊
+                va="bottom",    # 文字底部貼著波形基準線上方
+                alpha=0.9,
+                # 加上背景框可以防止站名被波形干擾
+                bbox=dict(facecolor='white', alpha=0.5, edgecolor='none', pad=0.1))
         # -----------------------
         
         # --- 核心修正點 2：標註 Picks 的時間計算 ---

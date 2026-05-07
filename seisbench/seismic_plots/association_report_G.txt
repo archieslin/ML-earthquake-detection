@@ -1,16 +1,18 @@
 
 分析完成！
 ----------------------------------------
-原始觸發總數：65 筆
-【確定】地震事件數 (>=5 站)：4 個
+原始觸發總數：128 筆
+【確定】地震事件數 (>=5 站)：6 個
 【疑似】地震事件數 (3-4 站)：0 個
 
 --- 地震事件列表 (>=5 站) ---
   station          start_time_str     lat      lon  depth_km  gamma_score  event_id                        note
-TW.ENA.10 2026-05-04T01:05:12.869 24.5612 121.7557       0.0         14.0         1 Earthquake (Total 13 picks)
-TW.ENA.10 2026-05-04T01:15:40.828 24.5744 121.7830       0.0          8.0         2  Earthquake (Total 8 picks)
-TW.ENA.10 2026-05-04T01:16:51.032 24.5614 121.7303       0.0         10.0         3  Earthquake (Total 9 picks)
-TW.ENA.10 2026-05-04T01:32:36.079 24.5739 121.7372       0.0         16.0         4 Earthquake (Total 13 picks)
+TW.ENA.10 2026-05-04T01:05:12.749 24.5578 121.7896       0.0        11.03         1 Earthquake (Total 13 picks)
+TW.ENA.10 2026-05-04T01:15:40.815 24.5733 121.7834       0.0         8.00         2  Earthquake (Total 8 picks)
+TW.ENA.10 2026-05-04T01:16:51.091 24.5612 121.7422       0.0        11.00         3 Earthquake (Total 10 picks)
+TW.ENA.10 2026-05-04T01:32:35.983 24.5702 121.7929       0.0        15.00         4 Earthquake (Total 14 picks)
+TW.ENA.10 2026-05-04T05:25:18.169 24.4868 121.7162       0.0         5.00         5  Earthquake (Total 5 picks)
+TW.ENA.10 2026-05-04T06:59:21.673 24.5595 121.7929       0.0        10.78         6 Earthquake (Total 11 picks)
 
 --- 疑似地震列表 (3-4 站) ---
 （無符合事件）
