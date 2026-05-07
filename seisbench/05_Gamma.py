@@ -166,7 +166,7 @@ ax.set_xlabel("Easting [km]")
 ax.set_ylabel("Northing [km]")
 ax.set_xlim(-100, 400)
 ax.set_ylim(2300, 3000)
-plt.savefig("Gamma_Association_Result.png", bbox_inches="tight")
+plt.savefig("./seismics_plots/Gamma_Association_Result.png", bbox_inches="tight")
 plt.close(fig)
 
 # --- 5. 輸出分析報告與詳細編目 ---
@@ -252,9 +252,17 @@ with open(OUTPUT_REPORT, "w", encoding="utf-8") as f:
 print(f"\n[系統通知] 統計報告已同步儲存至：{OUTPUT_REPORT}")
 
 
-### --- 6. 繪製每個事件的波形圖 (選配) ---
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import obspy
+from obspy import UTCDateTime
+
+# --- 核心優化 1：僅讀取標頭以獲取基本資訊，不載入數據 ---
+print("正在索引 mseed 檔案...")
+st_header = obspy.read(MSEED_PATH, headonly=True)
+
 # 1. 確保輸出目錄存在
-stream = obspy.read(MSEED_PATH)
 EVENT_PLOT_DIR = os.path.join(OUTPUT_DIR, "event_plots")
 os.makedirs(EVENT_PLOT_DIR, exist_ok=True)
 
@@ -262,107 +270,100 @@ print(f"開始繪製所有地震事件圖，總計：{len(catalog)} 個事件")
 
 for _, event in catalog.iterrows():
     event_idx = int(event["event_index"])
-    
-    # 獲取該事件對應的 picks
     event_indices = assignments[assignments["event_idx"] == event_idx]["pick_idx"]
-    # 假設你的原始 pick DataFrame 叫 pick_df (對應你之前的變數名)
     event_picks = pick_df.iloc[event_indices].to_dict(orient="records")
     
-    if not event_picks:
-        continue
+    if not event_picks: continue
 
+    origin_time = UTCDateTime(event["time"])
     # 計算繪圖時間範圍
     pick_times = [UTCDateTime(p["timestamp"]) for p in event_picks]
-    first = min(pick_times)
-    last = max(pick_times)
-    
-    # 事件發震時間 (Origin Time)
+    last_pick = max(pick_times)
     origin_time = UTCDateTime(event["time"])
-    print(f"正在繪製事件 {event_idx}：發震時間 {origin_time}, 觸發站數 {len(event_picks)}")
-
-    # 挑選並切割波形資料
-    sub = obspy.Stream()
-    unique_stations = np.unique([p["id"] for p in event_picks])
     
-    for sta_full_id in unique_stations:
-        # sta_full_id 格式如 "TW.ALS.10"
-        sta_code = sta_full_id.split(".")[1]
-        st_select = stream.select(station=sta_code, channel="??Z")
-        if st_select:
-            # 切割範圍：發震前 5 秒到最後一個 Pick 後 15 秒
-            sub += st_select.slice(origin_time - 10, last + 15)
+    # 定義切割範圍 (前 10 秒，後 15 秒)
+    plot_start = origin_time - 10
+    plot_end = last_pick + 15
+    print(f"正在繪製事件 {event_idx}：發震時間 {origin_time}, 站數 {len(np.unique([p['id'] for p in event_picks]))}")
 
-    if not sub:
-        print(f"跳過事件 {event_idx}：無有效波形範圍")
-        continue
-
-    sub.detrend("demean")
-    sub.filter("highpass", freq=2.0)
-
-    fig, ax = plt.subplots(figsize=(12, 8))
+    # --- 1. 初始化收集容器 ---
+    all_p_times, all_p_dists = [], []
+    all_s_times, all_s_dists = [], []
     all_distances = []
-    
-    # 繪製各站波形
+    unique_stations_in_event = [p["id"] for p in event_picks]
+
+    pad = 5
+    # 讀取波形
+    sub = obspy.read(MSEED_PATH, starttime=plot_start - pad, endtime=plot_end + pad)
+    sub.detrend("demean").filter("bandpass", freqmin=2.0, freqmax=5.0)
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # --- 2. 第一遍：繪製波形並收集所有 Pick 數據 ---
     for trace in sub:
         current_sta_id = f"{trace.stats.network}.{trace.stats.station}.10"
-        sta_label = trace.stats.station # 取得站名，如 "ALS"
+        if current_sta_id not in unique_stations_in_event: continue
         
         coords = station_dict.get(current_sta_id)
         if not coords: continue
         
         dist = np.sqrt((coords[0] - event["x(km)"])**2 + 
                        (coords[1] - event["y(km)"])**2 + 
-                       event["z(km)"]**2)
+                       (event["z(km)"] - coords[2] if len(coords)>2 else event["z(km)"])**2)
         all_distances.append(dist)
 
-        times = trace.times(reftime=origin_time)
-        peak = np.max(np.abs(trace.data))
-        if peak == 0: continue
-        normed = (trace.data / peak) * 5  
-        
-        # 畫波形
-        ax.plot(times, normed + dist, lw=0.8, color="gray", alpha=0.7)
-
-        # --- 新增：標記測站名稱 ---
-        x_text = -4.8  # 稍微往右偏一點點，不要貼死邊界
-        ax.text(x_text, dist + 0.5, sta_label, 
-                fontsize=8, 
-                color="blue", 
-                weight="bold",
-                ha="left",      # 靠左對齊
-                va="bottom",    # 文字底部貼著波形基準線上方
-                alpha=0.9,
-                # 加上背景框可以防止站名被波形干擾
-                bbox=dict(facecolor='white', alpha=0.5, edgecolor='none', pad=0.1))
-        # -----------------------
-        
-        # --- 核心修正點 2：標註 Picks 的時間計算 ---
+        # 收集該事件所有點位數據
         for p in event_picks:
             if p["id"] == current_sta_id:
-                # 同樣以 origin_time 為基準計算偏移秒數
+                t_rel = UTCDateTime(p["timestamp"]) - origin_time
+                if p["type"].lower() == "p":
+                    all_p_times.append(t_rel); all_p_dists.append(dist)
+                elif p["type"].lower() == "s":
+                    all_s_times.append(t_rel); all_s_dists.append(dist)
+
+        # 繪圖波形
+        times = trace.times(reftime=origin_time)
+        peak = np.max(np.abs(trace.data))
+        if peak > 0:
+            normed = (trace.data / peak) * 4
+            ax.plot(times, normed + dist, lw=0.7, color="black", alpha=0.6)
+            ax.text(-9, dist + 0.5, trace.stats.station, fontsize=7, color="blue", weight="bold")
+
+        # 標註 Picks (Vertical Lines)
+        for p in event_picks:
+            if p["id"] == current_sta_id:
                 x_pick = UTCDateTime(p["timestamp"]) - origin_time
-                
                 color = "blue" if p["type"].upper() == "P" else "red"
-                ls = "-" if p["type"].upper() == "P" else "--"
-                ax.vlines(x_pick, dist - 4, dist + 4, color=color, linestyle=ls, lw=2, zorder=5)
+                ax.vlines(x_pick, dist - 3, dist + 3, color=color, lw=1.5, zorder=5)
 
-    # 繪製發震時間 (Origin Time) 
-    # 因為現在 x 軸 0 就是 Origin Time，直接畫在 0 即可
-    ax.axvline(0, color="green", lw=2, ls=":", label="Origin Time", alpha=0.8)
-        
-    # 圖表美化
+    # --- 3. 第二遍：計算全局唯一的「平均/最大波速」 ---
+    final_p_vel, final_s_vel = 0, 0
+    if len(all_p_times) >= 2:
+        # 線性擬合的斜率即為該事件的全局視速度
+        final_p_vel = np.polyfit(all_p_times, all_p_dists, 1)[0]
+    if len(all_s_times) >= 2:
+        final_s_vel = np.polyfit(all_s_times, all_s_dists, 1)[0]
+
+    # --- 4. 繪製 Legend (放在迴圈外，確保只出現一個) ---
+    ax.axvline(0, color="green", lw=1.5, ls="--", label="Origin Time")
+    
+    if final_p_vel > 0:
+        ax.plot([], [], color="blue", label=f"Max Avg Vp: {final_p_vel:.2f} km/s")
+    if final_s_vel > 0:
+        ax.plot([], [], color="red", label=f"Max Avg Vs: {final_s_vel:.2f} km/s")
+
+    ax.legend(loc="upper left", fontsize=10, frameon=True, shadow=True)
+    
+    # 調整圖表細節
     if all_distances:
-        ax.set_ylim(min(all_distances) - 10, max(all_distances) + 15)
-        # 固定顯示範圍，例如：發震前 5 秒到最後一個 Pick 後 10 秒
-        ax.set_xlim(-5, (last - origin_time) + 10)
-    
-    ax.set_ylabel("Hypocentral distance [km]")
-    ax.set_xlabel("Time [s] relative to Origin Time") # 這裡標題也改一下
+        ax.set_ylim(min(all_distances) - 10, max(all_distances) + 10)
+        ax.set_xlim(-10, (last_pick - origin_time) + 15)
 
-    ax.set_title(f"Event {event_idx} | Depth: {event['z(km)']:.2f}km | Time: {event['time']}")
-    ax.grid(True, linestyle='--', alpha=0.5)
+    ax.set_ylabel("Hypocentral Distance (km)")
+    ax.set_xlabel("Time (s) relative to Origin Time")
+    ax.set_title(f"Event {event_idx} | Depth: {event['z(km)']:.2f}km")
+    ax.grid(True, linestyle=':', alpha=0.5)
     
-    plt.savefig(os.path.join(EVENT_PLOT_DIR, f"event_{event_idx:03d}.png"), bbox_inches="tight", dpi=150)
+    plt.savefig(os.path.join(EVENT_PLOT_DIR, f"event_{event_idx:03d}.png"), bbox_inches="tight", dpi=120)
     plt.close(fig)
-
-print("\n所有事件繪製完成！")
+    del sub

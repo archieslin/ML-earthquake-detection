@@ -7,9 +7,9 @@
 
 --- 地震事件列表 (>=5 站) ---
   station          start_time_str     lat      lon  depth_km  gamma_score  event_id                        note
-TW.ENA.10 2026-05-04T01:05:12.749 24.5578 121.7896       0.0        11.03         1 Earthquake (Total 13 picks)
-TW.ENA.10 2026-05-04T01:15:40.815 24.5733 121.7834       0.0         8.00         2  Earthquake (Total 8 picks)
-TW.ENA.10 2026-05-04T01:16:51.091 24.5612 121.7422       0.0        11.00         3 Earthquake (Total 10 picks)
+TW.ENA.10 2026-05-04T01:05:12.887 24.5678 121.7365       0.0        15.00         1 Earthquake (Total 13 picks)
+TW.ENA.10 2026-05-04T01:15:40.815 24.5733 121.7833       0.0         8.00         2  Earthquake (Total 8 picks)
+TW.ENA.10 2026-05-04T01:16:51.091 24.5612 121.7421       0.0        11.00         3 Earthquake (Total 10 picks)
 TW.ENA.10 2026-05-04T01:32:35.983 24.5702 121.7929       0.0        15.00         4 Earthquake (Total 14 picks)
 TW.ENA.10 2026-05-04T05:25:18.169 24.4868 121.7162       0.0         5.00         5  Earthquake (Total 5 picks)
 TW.ENA.10 2026-05-04T06:59:21.673 24.5595 121.7929       0.0        10.78         6 Earthquake (Total 11 picks)
