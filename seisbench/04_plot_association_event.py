@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from obspy import read, UTCDateTime
 
 # --- 參數設定 ---
-MSEED_PATH = "../Data/0504_09_10.mseed"
+MSEED_PATH = "../Data/0224_17_18.mseed"
 INPUT_FILE = "seismic_plots/associated_catalog_with_notes.csv"
 EVENT_PLOT_DIR = "seismic_plots/events"
 if not os.path.exists(EVENT_PLOT_DIR):

@@ -17,7 +17,7 @@ sns.set(font_scale=1.2)
 sns.set_style("ticks")
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0504.mseed"
+MSEED_PATH = "../Data/0224_17_18.mseed"
 OUTPUT_DIR = "seismic_plots"
 
 if not os.path.exists(OUTPUT_DIR):
@@ -166,7 +166,7 @@ ax.set_xlabel("Easting [km]")
 ax.set_ylabel("Northing [km]")
 ax.set_xlim(-100, 400)
 ax.set_ylim(2300, 3000)
-plt.savefig("./seismics_plots/Gamma_Association_Result.png", bbox_inches="tight")
+plt.savefig("Gamma_Association_Result.png", bbox_inches="tight")
 plt.close(fig)
 
 # --- 5. 輸出分析報告與詳細編目 ---
@@ -243,8 +243,8 @@ report_lines = [
 full_report_text = "\n".join(report_lines)
 
 # (選配) 如果想把這份純文字報告也存檔：
-with open(os.path.join(OUTPUT_DIR, "summary_report.txt"), "w", encoding="utf-8") as f:
-    f.write(full_report_text)
+# with open(os.path.join(OUTPUT_DIR, "summary_report.txt"), "w", encoding="utf-8") as f:
+    # f.write(full_report_text)
 
 with open(OUTPUT_REPORT, "w", encoding="utf-8") as f:
     f.write(full_report_text)

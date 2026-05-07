@@ -1,8 +1,6 @@
 import pandas as pd
-import numpy as np
-import os
 
-def analyze_seismic_catalog(file_path, time_window_sec=25, min_stations=3):
+def analyze_seismic_catalog(file_path, time_window_sec=20, min_stations=3):
     # 1. 載入資料
     try:
         df = pd.read_csv(file_path)

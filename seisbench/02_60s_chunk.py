@@ -6,7 +6,7 @@ import seisbench.models as sbm
 from obspy import read, UTCDateTime
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0504.mseed"
+MSEED_PATH = "../Data/0224_17_18.mseed"
 OUTPUT_DIR = "seismic_plots"
 CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
 # CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
