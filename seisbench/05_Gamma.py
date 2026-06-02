@@ -17,7 +17,7 @@ sns.set(font_scale=1.2)
 sns.set_style("ticks")
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0224_17_18.mseed"
+MSEED_PATH = "../Data/211024_M68.mseed"
 OUTPUT_DIR = "seismic_plots"
 
 if not os.path.exists(OUTPUT_DIR):
@@ -54,12 +54,12 @@ config["bfgs_bounds"] = (
     (0, config["z(km)"][1] + 1),  # x
     (None, None),  # t
 )
-config["dbscan_eps"] = 25  # seconds
+config["dbscan_eps"] = 12  # seconds
 config["dbscan_min_samples"] = 3
 
 # Filtering
-config["min_picks_per_eq"] = 5
-config["max_sigma11"] = 2.0
+config["min_picks_per_eq"] = 4
+config["max_sigma11"] = 4.5
 config["max_sigma22"] = 1.0
 config["max_sigma12"] = 1.0
 
@@ -295,7 +295,7 @@ for _, event in catalog.iterrows():
     pad = 5
     # 讀取波形
     sub = obspy.read(MSEED_PATH, starttime=plot_start - pad, endtime=plot_end + pad)
-    sub.detrend("demean").filter("bandpass", freqmin=2.0, freqmax=5.0)
+    sub.detrend("demean").filter("bandpass", freqmin=2, freqmax=25)
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -338,10 +338,10 @@ for _, event in catalog.iterrows():
 
     # --- 3. 第二遍：計算全局唯一的「平均/最大波速」 ---
     final_p_vel, final_s_vel = 0, 0
-    if len(all_p_times) >= 2:
+    if len(all_p_times) >= 3:
         # 線性擬合的斜率即為該事件的全局視速度
         final_p_vel = np.polyfit(all_p_times, all_p_dists, 1)[0]
-    if len(all_s_times) >= 2:
+    if len(all_s_times) >= 3:
         final_s_vel = np.polyfit(all_s_times, all_s_dists, 1)[0]
 
     # --- 4. 繪製 Legend (放在迴圈外，確保只出現一個) ---

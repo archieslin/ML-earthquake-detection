@@ -1,14 +1,20 @@
 
 分析完成！
 ----------------------------------------
-原始觸發總數：120 筆
-【確定】地震事件數 (>=5 站)：2 個
+原始觸發總數：381 筆
+【確定】地震事件數 (>=5 站)：8 個
 【疑似】地震事件數 (3-4 站)：0 個
 
 --- 地震事件列表 (>=5 站) ---
-  station          start_time_str     lat      lon  depth_km  gamma_score  event_id                        note
-TW.SGS.10 2026-02-24T17:23:10.788 23.1457 120.5279      4.88        53.29         1 Earthquake (Total 43 picks)
-TW.SGS.10 2026-02-24T17:48:50.808 23.1486 120.5253      0.23        40.11         2 Earthquake (Total 36 picks)
+   station          start_time_str     lat      lon  depth_km  gamma_score  event_id                         note
+TW.E062.10 2021-10-24T05:11:37.980 24.6336 121.5207     29.54       114.17         1 Earthquake (Total 142 picks)
+TW.F048.10 2021-10-24T05:11:37.089 24.4707 121.4327     17.20        59.52         2  Earthquake (Total 32 picks)
+TW.B034.10 2021-10-24T05:11:40.755 24.4168 121.1293      0.28        11.02         3   Earthquake (Total 5 picks)
+TW.E046.10 2021-10-24T05:12:47.092 24.7769 121.5999     31.06        74.97         4  Earthquake (Total 96 picks)
+TW.E068.10 2021-10-24T05:12:45.432 24.5765 121.4987     21.62        46.44         5  Earthquake (Total 30 picks)
+TW.F026.10 2021-10-24T05:12:46.300 24.3298 121.3390     21.67        13.05         6   Earthquake (Total 9 picks)
+TW.E062.10 2021-10-24T05:14:18.352 24.5267 121.4898      0.06        22.73         7  Earthquake (Total 19 picks)
+TW.E022.10 2021-10-24T05:14:17.590 24.7842 121.5930     32.45        29.16         8  Earthquake (Total 33 picks)
 
 --- 疑似地震列表 (3-4 站) ---
 （無符合事件）

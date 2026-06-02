@@ -6,12 +6,12 @@ import seisbench.models as sbm
 from obspy import read, UTCDateTime
 
 # --- 1. 參數設定 ---
-MSEED_PATH = "../Data/0224_17_18.mseed"
+MSEED_PATH = "../Data/211024_M68.mseed"
 OUTPUT_DIR = "seismic_plots"
 CHUNK_LENGTH = 1800  # 每次讀取 30 分鐘 (避免記憶體溢位)
-# CHUNK_LENGTH = 60    # 每次讀取 1 分鐘 (單一事件)
-OVERLAP = 60         # 時段間重疊 1 分鐘 (確保地震不被切斷)
-STRIDE = 3000         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
+CHUNK_LENGTH = 300    # 每次讀取 1 分鐘 (單一事件)
+OVERLAP = 10         # 時段間重疊 1 分鐘 (確保地震不被切斷)
+STRIDE = 250         # 模型滑動步長 (500 samples = 5秒，重疊越高越準)
 MODEL_TYPE = "stead" # 使用 EQTransformer
 
 if not os.path.exists(OUTPUT_DIR):
